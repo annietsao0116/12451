@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>八面體取代反應機制 | 無機化學互動學習</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg:        #f5f2eb;
+    --bg2:       #ede9df;
+    --bg3:       #e5e0d4;
+    --paper:     #faf8f3;
+    --ink:       #2c2a24;
+    --ink-light:#5a5750;
+    --sage:      #7d9b8a;
+    --sage-dk:  #5a7a67;
+    --dusty:     #8e7b6e;
+    --clay:      #b08060;
+    --mist:      #9aacb8;
+    --mist-dk:  #6e8fa0;
+    --rose:      #b08080;
+    --gold:      #b8973c;
+    --gold-lt:  #d4b86a;
+    --red-note: #c04040;
+    --blue-note:#4060a0;
+    --green-note:#508060;
+    --border:    #ccc5b5;
+    --shadow:    rgba(44,42,36,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 2.5rem 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
+  }
+  header p { color: rgba(245,242,235,0.6); font-size: 0.88rem; letter-spacing: 0.08em; }
+  .chapter-tag {
+    display: inline-block;
+    background: var(--sage);
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  nav.toc {
+    background: var(--paper);
+    border-bottom: 2px solid var(--border);
+    padding: 0 3rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky; top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav.toc a {
+    display: block;
+    padding: 0.9rem 1.2rem;
+    font-size: 0.82rem;
+    color: var(--ink-light);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  nav.toc a:hover, nav.toc a.active {
+    color: var(--sage-dk);
+    border-bottom-color: var(--sage);
+    background: var(--bg2);
+  }
+
+  main { max-width: 940px; margin: 0 auto; padding: 2rem 2rem 6rem; }
+
+  .section {
+    margin-bottom: 3rem;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .section.visible { opacity: 1; transform: translateY(0); }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    background: var(--sage);
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin-top: 0.2rem;
+  }
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .prose { color: var(--ink); line-height: 1.9; margin-bottom: 1rem; }
+  .note-card {
+    background: #fffde8;
+    border-left: 4px solid var(--gold);
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.93rem;
+    box-shadow: 2px 3px 10px rgba(180,155,60,0.12);
+  }
+  .note-card::before {
+    content: '✏️ 手寫筆記';
+    display: block;
+    font-size: 0.72rem;
+    color: var(--gold);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-box {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0;
+  }
+  .info-box.sage { border-color: var(--sage); background: #f0f6f2; }
+
+  .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.85rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+  }
+  th { background: var(--sage); color: #fff; padding: 0.7rem 1rem; }
+  td { padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); text-align: center; }
+
+  .quiz-card {
+    background: var(--paper);
+    border: 2px solid var(--mist);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin: 1.5rem 0;
+  }
+  .quiz-opt {
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+  }
+  .quiz-opt:hover { background: #f0f4f8; }
+  .quiz-feedback { margin-top: 0.8rem; display: none; padding: 0.7rem; border-radius: 6px; }
+  .quiz-feedback.show { display: block; }
+
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--sage);
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header>
+  <div class="chapter-tag">CH 12.4 — 12.5.2</div>
+  <h1>八面體取代反應：實驗證據與立體化學</h1>
+  <p>Experimental Evidence in Octahedral Substitution & Stereochemistry</p>
+</header>
+
+<nav class="toc">
+  <a href="#s1241">12.4.1 解離機制</a>
+  <a href="#s1244">12.4.4 SN₁CB</a>
+  <a href="#s125">12.5 立體化學</a>
+</nav>
+
+<main>
+  <section class="section visible" id="s1241">
+    <div class="section-header">
+      <span class="section-num">12.4.1</span>
+      <div class="section-title">解離機制與 LFAE</div>
+    </div>
+    <p class="prose">
+      在解離機制中，配合物先失去一個配體，形成五配位過渡態。
+      <strong>配位場活化能 (LFAE)</strong> 是判斷反應速率的重要熱力學指標。
+    </p>
+    <div class="note-card">
+      <span style="color:var(--red-note)">重點：</span> $d^3$ 與 Low-spin $d^4, d^5, d^6$ 具有正值的 LFAE，屬於惰性配合物。
+    </div>
+  </section>
+
+  <section class="section visible" id="s1244">
+    <div class="section-header">
+      <span class="section-num">12.4.4</span>
+      <div class="section-title">共軛鹼機制 (SN₁CB)</div>
+    </div>
+    <div class="info-box sage">
+      <h4>💡 核心概念</h4>
+      <p>SN₁CB 雖然表現出二階動力學，但本質上是單分子解離反應。OH⁻ 的作用是奪取質子形成共軛鹼。</p>
+    </div>
+  </section>
+
+  <section class="section visible" id="s125">
+    <div class="section-header">
+      <span class="section-num">12.5</span>
+      <div class="section-title">反應的立體化學</div>
+    </div>
+    <p class="prose">
+      產物的構型取決於中間體是方錐形 (SP) 還是三角雙錐 (TBP)。
+      通常 Cis 起始物傾向保留 Cis 構型。
+    </p>
+  </section>
+</main>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const pct = (window.scrollY / (doc.scrollHeight - doc.clientHeight)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+
+  // 簡易 Quiz 邏輯範例
+  function checkQuiz(isCorrect, id) {
+    const fb = document.getElementById(id);
+    fb.style.display = 'block';
+    fb.textContent = isCorrect ? "✅ 正確！" : "❌ 再試一次。";
+    fb.style.backgroundColor = isCorrect ? "#e8f5ee" : "#fdf0f0";
+  }
+</script>
+
+</body>
+</html>
